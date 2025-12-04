@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quick Share</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.tailwindcss.com" rel="stylesheet">
+
+<script type="module" src="./supabase-config.js"></script>
+<script type="module" src="./script.js"></script>
+
+</head>
+<body class="bg-gray-900 text-white">
+
+<div class="max-w-3xl mx-auto p-6">
+    <h1 class="text-4xl font-bold mb-6 text-center">Quick Share</h1>
+
+    <!-- FILE UPLOAD -->
+    <div class="bg-gray-800 p-4 rounded-xl mb-10">
+        <h2 class="text-2xl font-semibold mb-4">File Upload</h2>
+
+        <input id="fileInput" type="file" class="mb-4">
+
+        <button onclick="uploadFile()"
+                class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-bold">
+            Upload File
+        </button>
+
+        <input id="fileLink" class="w-full mt-4 p-2 bg-gray-700 rounded-lg" readonly placeholder="Share link appears here">
+    </div>
+
+    <!-- TEXT UPLOAD -->
+    <div class="bg-gray-800 p-4 rounded-xl mb-10">
+        <h2 class="text-2xl font-semibold mb-4">Text Snippet</h2>
+
+        <textarea id="textInput" class="w-full h-32 p-2 bg-gray-700 rounded-lg mb-4"
+                  placeholder="Enter text to share"></textarea>
+
+        <button onclick="uploadText()"
+                class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-bold">
+            Generate Link
+        </button>
+
+        <input id="textLink" class="w-full mt-4 p-2 bg-gray-700 rounded-lg" readonly placeholder="Share link appears here">
+    </div>
+</div>
+
+
+<!-- REDIRECT HANDLER -->
+<script type="module">
+    import { supabase } from "./supabase-config.js";
+
+    async function handleRedirect() {
+        const id = window.location.hash.slice(1);
+        if (!id) return; // no redirect needed
+
+        document.body.innerHTML = "<h1 class='text-3xl text-center mt-20'>Redirecting...</h1>";
+
+        const { data, error } = await supabase
+            .from("links")
+            .select("path")
+            .eq("id", id)
+            .single();
+
+        if (error || !data) {
+            document.body.innerHTML = "<h1 class='text-3xl text-center mt-20'>No link found.</h1>";
+            return;
+        }
+
+        window.location.href = data.path;
+    }
+
+    handleRedirect();
+</script>
+
+</body>
+</html>
